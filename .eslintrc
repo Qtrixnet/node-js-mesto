@@ -3,7 +3,8 @@
         "node": true
     },
     "extends": [
-        "airbnb-base"
+        "airbnb-base",
+        "plugin:prettier/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -11,7 +12,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "prettier"
     ],
     "settings": {
         "import/resolver": {
@@ -36,6 +38,7 @@
                 "js": "never",
                 "ts": "never"
             }
-        ]
+        ],
+        "prettier/prettier": "error"
     },
 }
