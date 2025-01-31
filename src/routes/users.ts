@@ -5,7 +5,7 @@ import {
   createUser,
   updateProfile,
   updateAvatar
-} from '../controllers/users'
+} from '@controllers/users'
 
 const router = Router()
 

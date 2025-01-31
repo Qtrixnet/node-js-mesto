@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import { Response } from 'express'
-import { ErrorMessage } from '../constants/errorConstants'
+import { ErrorMessage } from '@constants/errors'
 
 export const validateObjectId = (
   id: string,
@@ -9,7 +9,6 @@ export const validateObjectId = (
 ): void => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     res.status(status).json({ message: ErrorMessage.INVALID_ID })
-    return
   }
 }
 
@@ -19,6 +18,5 @@ export const handleValidationError = (res: Response, error: Error) => {
       message: ErrorMessage.VALIDATION_ERROR,
       error: error.message
     })
-    return
   }
 }

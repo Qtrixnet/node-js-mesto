@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum ErrorCode {
   BAD_REQUEST = 400,
   NOT_FOUND = 404,
@@ -8,3 +9,4 @@ export enum ErrorMessage {
   VALIDATION_ERROR = 'Ошибка валидации данных',
   INVALID_ID = 'Некорректный ID'
 }
+/* eslint-enable no-unused-vars */

@@ -1,7 +1,7 @@
-import Card from '../models/card'
 import { Request, Response } from 'express'
-import { validateObjectId, handleValidationError } from '../utils/validation'
-import { ErrorCode } from '../constants/errorConstants'
+import { validateObjectId, handleValidationError } from '@utils/validation'
+import Card from '@models/card'
+import { ErrorCode } from '@constants/errors'
 
 export const getCards = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -23,7 +23,7 @@ export const createCard = async (
 ): Promise<void> => {
   try {
     const { name, link } = req.body
-    const owner = req.user._id
+    const owner = res.locals.user._id
 
     if (!name || !link) {
       res
@@ -82,7 +82,7 @@ export const likeCard = async (req: Request, res: Response): Promise<void> => {
 
     const card = await Card.findByIdAndUpdate(
       cardId,
-      { $addToSet: { likes: req.user._id } },
+      { $addToSet: { likes: res.locals.user._id } },
       { new: true }
     )
 
@@ -114,7 +114,7 @@ export const dislikeCard = async (
 
     const card = await Card.findByIdAndUpdate(
       cardId,
-      { $pull: { likes: req.user._id } },
+      { $pull: { likes: res.locals.user._id } },
       { new: true }
     )
 

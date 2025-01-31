@@ -1,7 +1,7 @@
-import User from '../models/user'
 import { Request, Response } from 'express'
-import { validateObjectId, handleValidationError } from '../utils/validation'
-import { ErrorCode } from '../constants/errorConstants'
+import { validateObjectId, handleValidationError } from '@utils/validation'
+import { ErrorCode } from '@constants/errors'
+import User from '@models/user'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -75,7 +75,8 @@ export const updateProfile = async (
 ): Promise<void> => {
   try {
     const { name, about } = req.body
-    const userId = req.user._id
+    // eslint-disable-next-line no-underscore-dangle
+    const userId = res.locals.user._id
 
     if (!name || !about) {
       res
@@ -115,7 +116,7 @@ export const updateAvatar = async (
 ): Promise<void> => {
   try {
     const { avatar } = req.body
-    const userId = req.user._id
+    const userId = res.locals.user._id
 
     if (!avatar) {
       res.status(ErrorCode.BAD_REQUEST).json({ message: 'Аватар обязателен' })
