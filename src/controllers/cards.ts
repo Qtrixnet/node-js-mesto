@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import Card from '@models/card'
-import { ErrorCode } from '@constants/errors'
+import { ErrorCode } from '../constants/errors'
+import Card from '../models/card'
 
 export const getCards = async (_: Request, res: Response): Promise<void> => {
   try {

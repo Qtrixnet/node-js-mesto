@@ -5,14 +5,6 @@
     /* Modules */
     "module": "commonjs" /* Specify what module code is generated. */,
     "baseUrl": "./src",
-    "paths": {
-      "@constants/*": ["constants/*"],
-      "@controllers/*": ["controllers/*"],
-      "@models/*": ["models/*"],
-      "@routes/*": ["routes/*"],
-      "@types/*": ["types/*"],
-      "@utils/*": ["utils/*"]
-    },
     "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
     /* JavaScript Support */
     "allowJs": true /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,

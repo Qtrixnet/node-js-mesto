@@ -1,8 +1,8 @@
 import express, { NextFunction, Response, Request } from 'express'
 import mongoose from 'mongoose'
-import usersRouter from '@routes/users'
-import cardsRouter from '@routes/cards'
-import { ErrorCode } from '@constants/errors'
+import usersRouter from './routes/users'
+import cardsRouter from './routes/cards'
+import { ErrorCode } from './constants/errors'
 import { FakeAuth } from './types'
 
 const PORT = 3000

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { ErrorCode } from '@constants/errors'
-import User from '@models/user'
+import { ErrorCode } from '../constants/errors'
+import User from '../models/user'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
   try {
