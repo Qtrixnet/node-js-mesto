@@ -2,6 +2,7 @@ import express, { NextFunction, Response, Request } from 'express'
 import mongoose from 'mongoose'
 import usersRouter from '@routes/users'
 import cardsRouter from '@routes/cards'
+import { ErrorCode } from '@constants/errors'
 import { FakeAuth } from './types'
 
 const PORT = 3000
@@ -28,6 +29,10 @@ app.use((_: Request, res: Response<unknown, FakeAuth>, next: NextFunction) => {
 
 app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
+
+app.use((req: Request, res: Response) => {
+  res.status(ErrorCode.NOT_FOUND).json({ message: 'Страница не найдена' })
+})
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

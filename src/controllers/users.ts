@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { validateObjectId, handleValidationError } from '@utils/validation'
 import { ErrorCode } from '@constants/errors'
 import User from '@models/user'
 
@@ -8,13 +7,10 @@ export const getUsers = async (_: Request, res: Response): Promise<void> => {
     const users = await User.find({})
 
     res.json(users)
-  } catch (err) {
-    const error = err as Error
-
-    res.status(ErrorCode.INTERNAL_SERVER_ERROR).json({
-      message: 'Ошибка при получении пользователей',
-      error: error.message
-    })
+  } catch {
+    res
+      .status(ErrorCode.INTERNAL_SERVER_ERROR)
+      .send({ message: 'Произошла ошибка' })
   }
 }
 
@@ -24,8 +20,6 @@ export const getUserById = async (
 ): Promise<void> => {
   try {
     const { userId } = req.params
-
-    validateObjectId(userId, ErrorCode.BAD_REQUEST, res)
 
     const user = await User.findById(userId)
 
@@ -60,12 +54,15 @@ export const createUser = async (
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res.status(ErrorCode.INTERNAL_SERVER_ERROR).json({
-      message: 'Ошибка при создании пользователя',
-      error: error.message
-    })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }
 
@@ -77,13 +74,6 @@ export const updateProfile = async (
     const { name, about } = req.body
     // eslint-disable-next-line no-underscore-dangle
     const userId = res.locals.user._id
-
-    if (!name || !about) {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: 'Имя и информация о себе обязательны' })
-      return
-    }
 
     const user = await User.findByIdAndUpdate(
       userId,
@@ -102,11 +92,15 @@ export const updateProfile = async (
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при обновлении профиля', error })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }
 
@@ -117,11 +111,6 @@ export const updateAvatar = async (
   try {
     const { avatar } = req.body
     const userId = res.locals.user._id
-
-    if (!avatar) {
-      res.status(ErrorCode.BAD_REQUEST).json({ message: 'Аватар обязателен' })
-      return
-    }
 
     const user = await User.findByIdAndUpdate(
       userId,
@@ -140,10 +129,14 @@ export const updateAvatar = async (
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при обновлении аватара', error })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }

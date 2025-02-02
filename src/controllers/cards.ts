@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { validateObjectId, handleValidationError } from '@utils/validation'
 import Card from '@models/card'
 import { ErrorCode } from '@constants/errors'
 
@@ -8,12 +7,10 @@ export const getCards = async (_: Request, res: Response): Promise<void> => {
     const cards = await Card.find({})
 
     res.json(cards)
-  } catch (err) {
-    const error = err as Error
-
+  } catch {
     res
       .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при получении карточек', error: error.message })
+      .send({ message: 'Произошла ошибка' })
   }
 }
 
@@ -25,24 +22,21 @@ export const createCard = async (
     const { name, link } = req.body
     const owner = res.locals.user._id
 
-    if (!name || !link) {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: 'Имя и ссылка обязательны' })
-      return
-    }
-
     const card = await Card.create({ name, link, owner })
 
     res.status(201).json(card)
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при создании карточки', error: error.message })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }
 
@@ -52,8 +46,6 @@ export const deleteCard = async (
 ): Promise<void> => {
   try {
     const { cardId } = req.params
-
-    validateObjectId(cardId, ErrorCode.BAD_REQUEST, res)
 
     const card = await Card.findByIdAndDelete(cardId)
 
@@ -66,19 +58,21 @@ export const deleteCard = async (
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при удалении карточки', error: error.message })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }
 
 export const likeCard = async (req: Request, res: Response): Promise<void> => {
   try {
     const { cardId } = req.params
-
-    validateObjectId(cardId, ErrorCode.BAD_REQUEST, res)
 
     const card = await Card.findByIdAndUpdate(
       cardId,
@@ -95,11 +89,15 @@ export const likeCard = async (req: Request, res: Response): Promise<void> => {
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при лайке карточки', error: error.message })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }
 
@@ -109,8 +107,6 @@ export const dislikeCard = async (
 ): Promise<void> => {
   try {
     const { cardId } = req.params
-
-    validateObjectId(cardId, ErrorCode.BAD_REQUEST, res)
 
     const card = await Card.findByIdAndUpdate(
       cardId,
@@ -127,10 +123,14 @@ export const dislikeCard = async (
   } catch (err) {
     const error = err as Error
 
-    handleValidationError(res, error)
-
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .json({ message: 'Ошибка при дизлайке карточки', error: error.message })
+    if (error.name === 'ValidationError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .send({ message: 'Переданы невалидные данные' })
+    } else {
+      res
+        .status(ErrorCode.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Произошла ошибка' })
+    }
   }
 }
