@@ -45,5 +45,6 @@
         ],
         "prettier/prettier": "error",
         "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+        "@typescript-eslint/no-unused-vars": "error"
     }
 }

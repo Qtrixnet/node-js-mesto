@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ErrorCode } from '../constants/errors'
+import { ErrorCode, ErrorMessage } from '../constants/errors'
 import User from '../models/user'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
@@ -34,10 +34,16 @@ export const getUserById = async (
   } catch (err) {
     const error = err as Error
 
-    res.status(ErrorCode.INTERNAL_SERVER_ERROR).json({
-      message: 'Ошибка при получении пользователя',
-      error: error.message
-    })
+    if (error.name === 'CastError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .json({ message: ErrorMessage.INVALID_ID })
+    } else {
+      res.status(ErrorCode.INTERNAL_SERVER_ERROR).json({
+        message: 'Ошибка при получении пользователя',
+        error: error.message
+      })
+    }
   }
 }
 
@@ -72,7 +78,6 @@ export const updateProfile = async (
 ): Promise<void> => {
   try {
     const { name, about } = req.body
-    // eslint-disable-next-line no-underscore-dangle
     const userId = res.locals.user._id
 
     const user = await User.findByIdAndUpdate(
@@ -133,6 +138,10 @@ export const updateAvatar = async (
       res
         .status(ErrorCode.BAD_REQUEST)
         .send({ message: 'Переданы невалидные данные' })
+    } else if (error.name === 'CastError') {
+      res
+        .status(ErrorCode.BAD_REQUEST)
+        .json({ message: ErrorMessage.INVALID_ID })
     } else {
       res
         .status(ErrorCode.INTERNAL_SERVER_ERROR)

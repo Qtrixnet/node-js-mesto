@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { ErrorCode } from '../constants/errors'
+import { ErrorCode, ErrorMessage } from '../constants/errors'
 import Card from '../models/card'
 
 export const getCards = async (_: Request, res: Response): Promise<void> => {
@@ -58,10 +58,10 @@ export const deleteCard = async (
   } catch (err) {
     const error = err as Error
 
-    if (error.name === 'ValidationError') {
+    if (error.name === 'CastError') {
       res
         .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
+        .json({ message: ErrorMessage.INVALID_ID })
     } else {
       res
         .status(ErrorCode.INTERNAL_SERVER_ERROR)
@@ -89,10 +89,10 @@ export const likeCard = async (req: Request, res: Response): Promise<void> => {
   } catch (err) {
     const error = err as Error
 
-    if (error.name === 'ValidationError') {
+    if (error.name === 'CastError') {
       res
         .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
+        .json({ message: ErrorMessage.INVALID_ID })
     } else {
       res
         .status(ErrorCode.INTERNAL_SERVER_ERROR)
@@ -123,10 +123,10 @@ export const dislikeCard = async (
   } catch (err) {
     const error = err as Error
 
-    if (error.name === 'ValidationError') {
+    if (error.name === 'CastError') {
       res
         .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
+        .json({ message: ErrorMessage.INVALID_ID })
     } else {
       res
         .status(ErrorCode.INTERNAL_SERVER_ERROR)
