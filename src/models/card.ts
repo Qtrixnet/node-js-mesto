@@ -35,12 +35,15 @@ const cardSchema = new Schema<ICard>({
 })
 
 cardSchema.set('toJSON', {
-  transform: (_, ret) => ({
-    _id: ret._id.toString(),
-    name: ret.name,
-    link: ret.link,
-    owner: ret.owner.toString(),
-    likes: ret.likes.map((id: Schema.Types.ObjectId) => id.toString())
+  transform: (
+    _,
+    { _id, name, link, owner, likes }: ICard & { _id: Schema.Types.ObjectId }
+  ) => ({
+    _id: _id.toString(),
+    name,
+    link,
+    owner: owner.toString(),
+    likes: likes.map((id: Schema.Types.ObjectId) => id.toString())
   })
 })
 
