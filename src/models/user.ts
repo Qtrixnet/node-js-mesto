@@ -1,10 +1,16 @@
 import { Schema, model } from 'mongoose'
 import { isEmail } from 'validator'
 
+enum DefaultProfileInfo {
+  AVATAR = 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+  NAME = 'Жак-Ив Кусто',
+  ABOUT = 'Исследователь'
+}
+
 export interface IUser {
-  name: string
-  about: string
-  avatar: string
+  name?: string
+  about?: string
+  avatar?: string
   email: string
   password: string
 }
@@ -14,17 +20,17 @@ const userSchema = new Schema<IUser>({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true
+    default: DefaultProfileInfo.NAME
   },
   about: {
     type: String,
     minlength: 2,
     maxlength: 200,
-    required: true
+    default: DefaultProfileInfo.ABOUT
   },
   avatar: {
     type: String,
-    required: true
+    default: DefaultProfileInfo.AVATAR
   },
   email: {
     type: String,

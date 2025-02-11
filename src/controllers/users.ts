@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import bcrypt from 'bcrypt'
 import { ErrorCode, ErrorMessage } from '../constants/errors'
 import User from '../models/user'
 
@@ -51,10 +52,18 @@ export const createUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const { name, about, avatar } = req.body
+  const { name, about, avatar, email, password } = req.body
 
-    const user = await User.create({ name, about, avatar })
+  try {
+    const hash = await bcrypt.hash(password, 10)
+
+    const user = await User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash
+    })
 
     res.status(201).json(user)
   } catch (err) {
