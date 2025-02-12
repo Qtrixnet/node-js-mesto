@@ -1,5 +1,6 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, Model, Document } from 'mongoose'
 import { isEmail } from 'validator'
+import bcrypt from 'bcrypt'
 
 enum DefaultProfileInfo {
   AVATAR = 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
@@ -15,7 +16,14 @@ export interface IUser {
   password: string
 }
 
-const userSchema = new Schema<IUser>({
+interface UserModel extends Model<IUser> {
+  findUserByCredentials: (
+    email: string,
+    password: string
+  ) => Promise<Document<unknown, any, IUser>>
+}
+
+const userSchema = new Schema<IUser, UserModel>({
   name: {
     type: String,
     minlength: 2,
@@ -69,4 +77,21 @@ userSchema.set('toJSON', {
   })
 })
 
-export default model<IUser>('User', userSchema)
+userSchema.static(
+  'findUserByCredentials',
+  async function findUserByCredentials(email: string, password: string) {
+    const user = await this.findOne({
+      email
+    }).select('+password')
+
+    if (!user) throw new Error('Неправильные почта или пароль')
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password)
+
+    if (!isPasswordMatched) throw new Error('Неправильные почта или пароль')
+
+    return user
+  }
+)
+
+export default model<IUser, UserModel>('User', userSchema)
