@@ -1,11 +1,11 @@
-import express, { Response, Request } from 'express'
+import express, { Response, Request, NextFunction } from 'express'
 import mongoose from 'mongoose'
 import { usersRouter } from './routes/users'
 import { cardsRouter } from './routes/cards'
-import { ErrorCode } from './constants/errors'
 import { login, createUser } from './controllers/users'
 import { auth } from './middlewares/auth'
 import { requestLogger, errorLogger } from './middlewares/logger'
+import { NotFoundError } from './errors/not-found-error'
 
 const PORT = 3000
 
@@ -34,8 +34,8 @@ app.use('/cards', cardsRouter)
 
 app.use(errorLogger)
 
-app.use((_: Request, res: Response) => {
-  res.status(ErrorCode.NOT_FOUND).json({ message: 'Страница не найдена' })
+app.use((_req: Request, _res: Response, next: NextFunction) => {
+  next(new NotFoundError('Страница не найдена'))
 })
 
 app.listen(PORT, () => {

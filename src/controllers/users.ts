@@ -2,11 +2,12 @@ import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { Error as MongooseError } from 'mongoose'
-import { ErrorCode, ErrorMessage } from '../constants/errors'
+import { ErrorCode } from '../constants/errors'
 import { User } from '../models/user'
 import { FakeAuth } from '../types'
 import { ConflictError } from '../errors/conflict-error'
 import { ValidationError } from '../errors/validation-error'
+import { NotFoundError } from '../errors/not-found-error'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -22,7 +23,8 @@ export const getUsers = async (_: Request, res: Response): Promise<void> => {
 
 export const getUserById = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { userId } = req.params
@@ -30,25 +32,15 @@ export const getUserById = async (
     const user = await User.findById(userId)
 
     if (!user) {
-      res
-        .status(ErrorCode.NOT_FOUND)
-        .json({ message: 'Пользователь не найден' })
-      return
+      throw new NotFoundError('Пользователь не найден')
     }
 
     res.json(user)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'CastError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: ErrorMessage.INVALID_ID })
+    if (err instanceof MongooseError.CastError) {
+      next(new ValidationError(err.message))
     } else {
-      res.status(ErrorCode.INTERNAL_SERVER_ERROR).json({
-        message: 'Ошибка при получении пользователя',
-        error: error.message
-      })
+      next(err)
     }
   }
 }
@@ -99,10 +91,7 @@ export const updateProfile = async (
     )
 
     if (!user) {
-      res
-        .status(ErrorCode.NOT_FOUND)
-        .json({ message: 'Пользователь не найден' })
-      return
+      throw new NotFoundError('Пользователь не найден')
     }
 
     res.json(user)
@@ -133,10 +122,7 @@ export const updateAvatar = async (
     )
 
     if (!user) {
-      res
-        .status(ErrorCode.NOT_FOUND)
-        .json({ message: 'Пользователь не найден' })
-      return
+      throw new NotFoundError('Пользователь не найден')
     }
 
     res.json(user)
@@ -181,19 +167,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const getCurrentUserInfo = (
+export const getCurrentUserInfo = async (
   _req: Request,
   res: Response<unknown, FakeAuth>,
   next: NextFunction
 ) => {
-  const userId = res.locals.user._id
+  try {
+    const userId = res.locals.user._id
 
-  User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        throw new Error('Пользователь не найден')
-      }
-      res.send(user)
-    })
-    .catch(next)
+    const user = await User.findById(userId)
+
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден')
+    }
+
+    res.send(user)
+  } catch (err) {
+    next(err)
+  }
 }

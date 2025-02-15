@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { Error as MongooseError } from 'mongoose'
-import { ErrorCode, ErrorMessage } from '../constants/errors'
+import { ErrorCode } from '../constants/errors'
 import { Card } from '../models/card'
 import { ValidationError } from '../errors/validation-error'
+import { NotFoundError } from '../errors/not-found-error'
 
 export const getCards = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -39,7 +40,8 @@ export const createCard = async (
 
 export const deleteCard = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { cardId } = req.params
@@ -47,27 +49,24 @@ export const deleteCard = async (
     const card = await Card.findByIdAndDelete(cardId)
 
     if (!card) {
-      res.status(ErrorCode.NOT_FOUND).json({ message: 'Карточка не найдена' })
-      return
+      throw new NotFoundError('Карточка не найдена')
     }
 
     res.json({ message: 'Карточка удалена' })
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'CastError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: ErrorMessage.INVALID_ID })
+    if (err instanceof MongooseError.CastError) {
+      next(new ValidationError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
 
-export const likeCard = async (req: Request, res: Response): Promise<void> => {
+export const likeCard = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { cardId } = req.params
 
@@ -78,29 +77,23 @@ export const likeCard = async (req: Request, res: Response): Promise<void> => {
     )
 
     if (!card) {
-      res.status(ErrorCode.NOT_FOUND).json({ message: 'Карточка не найдена' })
-      return
+      throw new NotFoundError('Карточка не найдена')
     }
 
     res.json(card)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'CastError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: ErrorMessage.INVALID_ID })
+    if (err instanceof MongooseError.CastError) {
+      next(new ValidationError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
 
 export const dislikeCard = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { cardId } = req.params
@@ -112,22 +105,15 @@ export const dislikeCard = async (
     )
 
     if (!card) {
-      res.status(ErrorCode.NOT_FOUND).json({ message: 'Карточка не найдена' })
-      return
+      throw new NotFoundError('Карточка не найдена')
     }
 
     res.json(card)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'CastError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: ErrorMessage.INVALID_ID })
+    if (err instanceof MongooseError.CastError) {
+      next(new ValidationError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
