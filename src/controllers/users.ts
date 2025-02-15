@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
+import { Error as MongooseError } from 'mongoose'
 import { ErrorCode, ErrorMessage } from '../constants/errors'
 import { User } from '../models/user'
 import { FakeAuth } from '../types'
+import { ConflictError } from '../errors/conflict-error'
+import { ValidationError } from '../errors/validation-error'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -52,7 +55,8 @@ export const getUserById = async (
 
 export const createUser = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { name, about, avatar, email, password } = req.body
@@ -69,23 +73,20 @@ export const createUser = async (
 
     res.status(201).json(user)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'ValidationError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
+    if (err instanceof MongooseError.ValidationError) {
+      next(new ValidationError(err.message))
+    } else if (err instanceof Error && err.message.includes('11000')) {
+      next(new ConflictError('Пользователь уже существует'))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
 
 export const updateProfile = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { name, about } = req.body
@@ -106,23 +107,20 @@ export const updateProfile = async (
 
     res.json(user)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'ValidationError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
+    if (err instanceof MongooseError.CastError) {
+      next(new ValidationError(err.message))
+    } else if (err instanceof MongooseError.ValidationError) {
+      next(new ValidationError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
 
 export const updateAvatar = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { avatar } = req.body
@@ -143,20 +141,12 @@ export const updateAvatar = async (
 
     res.json(user)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'ValidationError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
-    } else if (error.name === 'CastError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .json({ message: ErrorMessage.INVALID_ID })
+    if (err instanceof MongooseError.CastError) {
+      next(new ValidationError(err.message))
+    } else if (err instanceof MongooseError.ValidationError) {
+      next(new ValidationError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }

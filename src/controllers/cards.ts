@@ -1,6 +1,8 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
+import { Error as MongooseError } from 'mongoose'
 import { ErrorCode, ErrorMessage } from '../constants/errors'
 import { Card } from '../models/card'
+import { ValidationError } from '../errors/validation-error'
 
 export const getCards = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -16,7 +18,8 @@ export const getCards = async (_: Request, res: Response): Promise<void> => {
 
 export const createCard = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { name, link } = req.body
@@ -26,16 +29,10 @@ export const createCard = async (
 
     res.status(201).json(card)
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === 'ValidationError') {
-      res
-        .status(ErrorCode.BAD_REQUEST)
-        .send({ message: 'Переданы невалидные данные' })
+    if (err instanceof MongooseError.ValidationError) {
+      next(new ValidationError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
