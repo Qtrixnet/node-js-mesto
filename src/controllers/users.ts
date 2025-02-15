@@ -8,6 +8,8 @@ import { FakeAuth } from '../types'
 import { ConflictError } from '../errors/conflict-error'
 import { ValidationError } from '../errors/validation-error'
 import { NotFoundError } from '../errors/not-found-error'
+import { AuthError } from '../errors/auth-error'
+import { UnauthorizedError } from '../errors/unauthorized-error'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -137,7 +139,11 @@ export const updateAvatar = async (
   }
 }
 
-export const login = async (req: Request, res: Response): Promise<void> => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { email, password } = req.body
 
@@ -155,14 +161,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       })
       .send({ message: 'Вы вошли в систему!' })
   } catch (err) {
-    const error = err as Error
-
-    if (error.name === '?') {
-      res.status(ErrorCode.UNAUTHORIZED).send({ message: 'Авторизуйтесь' })
+    if (err instanceof AuthError) {
+      next(new UnauthorizedError(err.message))
     } else {
-      res
-        .status(ErrorCode.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Произошла ошибка' })
+      next(err)
     }
   }
 }
