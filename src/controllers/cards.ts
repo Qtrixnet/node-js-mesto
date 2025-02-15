@@ -1,19 +1,20 @@
 import { Request, Response, NextFunction } from 'express'
 import { Error as MongooseError } from 'mongoose'
-import { ErrorCode } from '../constants/errors'
 import { Card } from '../models/card'
 import { ValidationError } from '../errors/validation-error'
 import { NotFoundError } from '../errors/not-found-error'
 
-export const getCards = async (_: Request, res: Response): Promise<void> => {
+export const getCards = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const cards = await Card.find({})
+    const cards = await Card.find({}).populate('owner')
 
     res.json(cards)
-  } catch {
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .send({ message: 'Произошла ошибка' })
+  } catch (err) {
+    next(err)
   }
 }
 

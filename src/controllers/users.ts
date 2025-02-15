@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { Error as MongooseError } from 'mongoose'
-import { ErrorCode } from '../constants/errors'
 import { User } from '../models/user'
 import { FakeAuth } from '../types'
 import { ConflictError } from '../errors/conflict-error'
@@ -11,15 +10,17 @@ import { NotFoundError } from '../errors/not-found-error'
 import { AuthError } from '../errors/auth-error'
 import { UnauthorizedError } from '../errors/unauthorized-error'
 
-export const getUsers = async (_: Request, res: Response): Promise<void> => {
+export const getUsers = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const users = await User.find({})
 
     res.json(users)
-  } catch {
-    res
-      .status(ErrorCode.INTERNAL_SERVER_ERROR)
-      .send({ message: 'Произошла ошибка' })
+  } catch (err) {
+    next(err)
   }
 }
 

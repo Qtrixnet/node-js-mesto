@@ -6,6 +6,7 @@ import { login, createUser } from './controllers/users'
 import { auth } from './middlewares/auth'
 import { requestLogger, errorLogger } from './middlewares/logger'
 import { NotFoundError } from './errors/not-found-error'
+import { errorHandler } from './middlewares/error-handler'
 
 const PORT = 3000
 
@@ -24,7 +25,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestLogger)
 
 app.use('/signin', login)
-
 app.use('/signup', createUser)
 
 app.use(auth)
@@ -33,6 +33,7 @@ app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
 
 app.use(errorLogger)
+app.use(errorHandler)
 
 app.use((_req: Request, _res: Response, next: NextFunction) => {
   next(new NotFoundError('Страница не найдена'))
