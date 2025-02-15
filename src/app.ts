@@ -5,6 +5,7 @@ import cardsRouter from './routes/cards'
 import { ErrorCode } from './constants/errors'
 import { login, createUser } from './controllers/users'
 import auth from './middlewares/auth'
+import { requestLogger, errorLogger } from './middlewares/logger'
 
 const PORT = 3000
 
@@ -20,6 +21,8 @@ mongoose
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use(requestLogger)
+
 app.use('/signin', login)
 
 app.use('/signup', createUser)
@@ -28,6 +31,8 @@ app.use(auth)
 
 app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
+
+app.use(errorLogger)
 
 app.use((_: Request, res: Response) => {
   res.status(ErrorCode.NOT_FOUND).json({ message: 'Страница не найдена' })
