@@ -8,7 +8,7 @@ import { auth } from './middlewares/auth'
 import { requestLogger, errorLogger } from './middlewares/logger'
 import { NotFoundError } from './errors/not-found-error'
 import { errorHandler } from './middlewares/error-handler'
-import { validateLogin, validateUserData } from './constants/validators'
+import { validateLogin, validateUserData } from './utils/validators'
 
 const PORT = 3000
 
@@ -34,13 +34,13 @@ app.use(auth)
 app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
 
+app.use((_req: Request, _res: Response, next: NextFunction) => {
+  next(new NotFoundError('Роут не найден'))
+})
+
 app.use(errorLogger)
 app.use(errors())
 app.use(errorHandler)
-
-app.use((_req: Request, _res: Response, next: NextFunction) => {
-  next(new NotFoundError('Страница не найдена'))
-})
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

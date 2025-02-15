@@ -2,13 +2,13 @@ import { celebrate, Joi, Segments } from 'celebrate'
 
 export const validateUserId = celebrate({
   [Segments.PARAMS]: Joi.object({
-    id: Joi.string().alphanum().required().length(24)
+    id: Joi.string().hex().required().length(24)
   })
 })
 
 export const validateLogin = celebrate({
   [Segments.BODY]: Joi.object({
-    email: Joi.string().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required()
   })
 })
@@ -26,8 +26,7 @@ export const validateUserData = celebrate({
 export const validateEditableUserData = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri()
+    about: Joi.string().min(2).max(200)
   })
 })
 
@@ -48,6 +47,6 @@ export const validateCard = celebrate({
 
 export const validateCardId = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
-    id: Joi.string().alphanum().required().length(24)
+    id: Joi.string().hex().required().length(24)
   })
 })

@@ -8,7 +8,6 @@ import { ConflictError } from '../errors/conflict-error'
 import { ValidationError } from '../errors/validation-error'
 import { NotFoundError } from '../errors/not-found-error'
 import { AuthError } from '../errors/auth-error'
-import { UnauthorizedError } from '../errors/unauthorized-error'
 
 export const getUsers = async (
   _: Request,
@@ -163,7 +162,7 @@ export const login = async (
       .send({ message: 'Вы вошли в систему!' })
   } catch (err) {
     if (err instanceof AuthError) {
-      next(new UnauthorizedError(err.message))
+      next(new AuthError(err.message))
     } else {
       next(err)
     }

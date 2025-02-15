@@ -10,7 +10,7 @@ import {
   validateAvatar,
   validateEditableUserData,
   validateUserId
-} from '../constants/validators'
+} from '../utils/validators'
 
 export const usersRouter = Router()
 

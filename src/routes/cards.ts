@@ -6,7 +6,7 @@ import {
   likeCard,
   dislikeCard
 } from '../controllers/cards'
-import { validateCard, validateCardId } from '../constants/validators'
+import { validateCard, validateCardId } from '../utils/validators'
 
 export const cardsRouter = Router()
 

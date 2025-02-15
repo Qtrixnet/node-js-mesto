@@ -3,6 +3,7 @@ import { Error as MongooseError } from 'mongoose'
 import { Card } from '../models/card'
 import { ValidationError } from '../errors/validation-error'
 import { NotFoundError } from '../errors/not-found-error'
+import { ForbiddenError } from '../errors/forbidden-error'
 
 export const getCards = async (
   _: Request,
@@ -46,12 +47,19 @@ export const deleteCard = async (
 ): Promise<void> => {
   try {
     const { cardId } = req.params
+    const userId = res.locals.user._id
 
-    const card = await Card.findByIdAndDelete(cardId)
+    const card = await Card.findById(cardId)
 
     if (!card) {
       throw new NotFoundError('Карточка не найдена')
     }
+
+    if (card.owner.toString() !== userId) {
+      throw new ForbiddenError('Нельзя удалять карточки других пользователей')
+    }
+
+    await Card.findByIdAndDelete(cardId)
 
     res.json({ message: 'Карточка удалена' })
   } catch (err) {

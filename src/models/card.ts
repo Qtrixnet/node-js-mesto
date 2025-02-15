@@ -17,7 +17,15 @@ const cardSchema = new Schema<ICard>({
   },
   link: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator(link: string) {
+        const regexp =
+          /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
+        return regexp.test(link)
+      },
+      message: 'Некорректный формат ссылки'
+    }
   },
   owner: {
     type: Schema.Types.ObjectId,
