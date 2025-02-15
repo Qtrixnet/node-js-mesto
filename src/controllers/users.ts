@@ -1,8 +1,9 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { ErrorCode, ErrorMessage } from '../constants/errors'
 import User from '../models/user'
+import { FakeAuth } from '../types'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {
   try {
@@ -188,4 +189,21 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         .send({ message: 'Произошла ошибка' })
     }
   }
+}
+
+export const getCurrentUserInfo = (
+  _req: Request,
+  res: Response<unknown, FakeAuth>,
+  next: NextFunction
+) => {
+  const userId = res.locals.user._id
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new Error('Пользователь не найден')
+      }
+      res.send(user)
+    })
+    .catch(next)
 }

@@ -4,12 +4,14 @@ import {
   getUserById,
   createUser,
   updateProfile,
-  updateAvatar
+  updateAvatar,
+  getCurrentUserInfo
 } from '../controllers/users'
 
 const router = Router()
 
 router.get('/', getUsers)
+router.get('/me', getCurrentUserInfo)
 router.get('/:userId', getUserById)
 router.post('/', createUser)
 router.patch('/me', updateProfile)
