@@ -39,7 +39,15 @@ const userSchema = new Schema<IUser, UserModel>({
   },
   avatar: {
     type: String,
-    default: DefaultProfileInfo.AVATAR
+    default: DefaultProfileInfo.AVATAR,
+    validate: {
+      validator(avatar: string) {
+        const regexp =
+          /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/
+        return regexp.test(avatar)
+      },
+      message: 'Некорректный формат ссылки'
+    }
   },
   email: {
     type: String,
