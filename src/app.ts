@@ -1,10 +1,10 @@
 import express, { Response, Request } from 'express'
 import mongoose from 'mongoose'
-import usersRouter from './routes/users'
-import cardsRouter from './routes/cards'
+import { usersRouter } from './routes/users'
+import { cardsRouter } from './routes/cards'
 import { ErrorCode } from './constants/errors'
 import { login, createUser } from './controllers/users'
-import auth from './middlewares/auth'
+import { auth } from './middlewares/auth'
 import { requestLogger, errorLogger } from './middlewares/logger'
 
 const PORT = 3000

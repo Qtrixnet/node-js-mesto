@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { verify } from 'jsonwebtoken'
 import { FakeAuth } from '../types'
+import { AuthError } from '../errors/auth-error'
 
-const auth = (
+export const auth = (
   req: Request,
   res: Response<unknown, FakeAuth>,
   next: NextFunction
@@ -10,7 +11,7 @@ const auth = (
   const { cookies } = req
 
   if (!cookies?.jwt) {
-    return next(new Error('Необходима авторизация'))
+    return next(new AuthError('Авторизуйтесь'))
   }
 
   let payload
@@ -22,8 +23,6 @@ const auth = (
 
     return next()
   } catch {
-    return next(new Error('Необходима авторизация'))
+    return next(new AuthError('Авторизуйтесь'))
   }
 }
-
-export default auth

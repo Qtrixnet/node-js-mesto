@@ -8,13 +8,11 @@ import {
   getCurrentUserInfo
 } from '../controllers/users'
 
-const router = Router()
+export const usersRouter = Router()
 
-router.get('/', getUsers)
-router.get('/me', getCurrentUserInfo)
-router.get('/:userId', getUserById)
-router.post('/', createUser)
-router.patch('/me', updateProfile)
-router.patch('/me/avatar', updateAvatar)
-
-export default router
+usersRouter.get('/', getUsers)
+usersRouter.get('/me', getCurrentUserInfo)
+usersRouter.get('/:userId', getUserById)
+usersRouter.post('/', createUser)
+usersRouter.patch('/me', updateProfile)
+usersRouter.patch('/me/avatar', updateAvatar)

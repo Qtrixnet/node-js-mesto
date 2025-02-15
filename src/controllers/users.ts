@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import { sign } from 'jsonwebtoken'
 import { ErrorCode, ErrorMessage } from '../constants/errors'
-import User from '../models/user'
+import { User } from '../models/user'
 import { FakeAuth } from '../types'
 
 export const getUsers = async (_: Request, res: Response): Promise<void> => {

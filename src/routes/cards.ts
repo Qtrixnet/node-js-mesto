@@ -7,12 +7,10 @@ import {
   dislikeCard
 } from '../controllers/cards'
 
-const router = Router()
+export const cardsRouter = Router()
 
-router.get('/', getCards)
-router.post('/', createCard)
-router.delete('/:cardId', deleteCard)
-router.put('/:cardId/likes', likeCard)
-router.delete('/:cardId/likes', dislikeCard)
-
-export default router
+cardsRouter.get('/', getCards)
+cardsRouter.post('/', createCard)
+cardsRouter.delete('/:cardId', deleteCard)
+cardsRouter.put('/:cardId/likes', likeCard)
+cardsRouter.delete('/:cardId/likes', dislikeCard)

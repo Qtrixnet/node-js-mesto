@@ -47,4 +47,4 @@ cardSchema.set('toJSON', {
   })
 })
 
-export default model<ICard>('Card', cardSchema)
+export const Card = model<ICard>('Card', cardSchema)

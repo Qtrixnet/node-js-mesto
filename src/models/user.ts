@@ -1,6 +1,7 @@
 import { Schema, model, Model, Document } from 'mongoose'
 import { isEmail } from 'validator'
 import bcrypt from 'bcrypt'
+import { AuthError } from '../errors/auth-error'
 
 enum DefaultProfileInfo {
   AVATAR = 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
@@ -84,14 +85,14 @@ userSchema.static(
       email
     }).select('+password')
 
-    if (!user) throw new Error('Неправильные почта или пароль')
+    if (!user) throw new AuthError('Неправильные почта или пароль')
 
     const isPasswordMatched = await bcrypt.compare(password, user.password)
 
-    if (!isPasswordMatched) throw new Error('Неправильные почта или пароль')
+    if (!isPasswordMatched) throw new AuthError('Неправильные почта или пароль')
 
     return user
   }
 )
 
-export default model<IUser, UserModel>('User', userSchema)
+export const User = model<IUser, UserModel>('User', userSchema)
