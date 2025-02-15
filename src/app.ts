@@ -1,5 +1,6 @@
 import express, { Response, Request, NextFunction } from 'express'
 import mongoose from 'mongoose'
+import { errors } from 'celebrate'
 import { usersRouter } from './routes/users'
 import { cardsRouter } from './routes/cards'
 import { login, createUser } from './controllers/users'
@@ -7,6 +8,7 @@ import { auth } from './middlewares/auth'
 import { requestLogger, errorLogger } from './middlewares/logger'
 import { NotFoundError } from './errors/not-found-error'
 import { errorHandler } from './middlewares/error-handler'
+import { validateLogin, validateUserData } from './constants/validators'
 
 const PORT = 3000
 
@@ -24,8 +26,8 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(requestLogger)
 
-app.use('/signin', login)
-app.use('/signup', createUser)
+app.use('/signin', validateLogin, login)
+app.use('/signup', validateUserData, createUser)
 
 app.use(auth)
 
@@ -33,6 +35,7 @@ app.use('/users', usersRouter)
 app.use('/cards', cardsRouter)
 
 app.use(errorLogger)
+app.use(errors())
 app.use(errorHandler)
 
 app.use((_req: Request, _res: Response, next: NextFunction) => {

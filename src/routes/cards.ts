@@ -6,11 +6,12 @@ import {
   likeCard,
   dislikeCard
 } from '../controllers/cards'
+import { validateCard, validateCardId } from '../constants/validators'
 
 export const cardsRouter = Router()
 
 cardsRouter.get('/', getCards)
-cardsRouter.post('/', createCard)
-cardsRouter.delete('/:cardId', deleteCard)
-cardsRouter.put('/:cardId/likes', likeCard)
-cardsRouter.delete('/:cardId/likes', dislikeCard)
+cardsRouter.post('/', validateCard, createCard)
+cardsRouter.delete('/:cardId', validateCardId, deleteCard)
+cardsRouter.put('/:cardId/likes', validateCardId, likeCard)
+cardsRouter.delete('/:cardId/likes', validateCardId, dislikeCard)

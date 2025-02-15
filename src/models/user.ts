@@ -47,7 +47,7 @@ const userSchema = new Schema<IUser, UserModel>({
     unique: true,
     validate: {
       validator: (email: string) => isEmail(email),
-      message: 'Invalid email format'
+      message: 'Некорректный формат email'
     }
   },
   password: {

@@ -5,7 +5,3 @@ export enum ErrorCode {
   CONFLICT = 409,
   INTERNAL_SERVER_ERROR = 500
 }
-
-export enum ErrorMessage {
-  INVALID_ID = 'Некорректный ID'
-}
